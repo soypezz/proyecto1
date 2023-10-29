@@ -8,7 +8,8 @@ const restauranteSchema = moongose.Schema({
   categoria: { type: String, required: [true, 'Categoría del restaurante'] },
   capacidad: { type: Number, required: [true, 'Capacidad del restaurante'] },
   estado: { type: Boolean, default: true },
-  popularidad: {type: Number}
+  popularidad: { type: Number, default: 0 },
+  pedidosEntregados: { type: Number, default: 0 }
 });
 
 export default moongose.model('Restaurante', restauranteSchema);

@@ -1,5 +1,22 @@
 import Restaurante from './restaurantes.model';
+import Pedido from '../pedidos/pedidos.model';
 
+
+async function calcularPopularidad() {
+  const restaurantes = await Restaurante.find({ estado: true });
+
+  for (const restaurante of restaurantes) {
+    const pedidosEntregados = await Pedido.countDocuments({
+      id_restaurante: restaurante._id,
+      estado: 'ENTREGADO'
+    });
+
+    restaurante.pedidosEntregados = pedidosEntregados;
+    restaurante.popularidad = pedidosEntregados;
+
+    await restaurante.save();
+  }
+}
 
 export async function createRestaurante(req, res) {
   try {
@@ -58,10 +75,15 @@ export async function getRestauranteById(req, res) {
         condiciones.categoria = categoria;
       }
       if (nombre) {
-        condiciones.nombre = nombre;
+        condiciones.nombre = { $regex: new RegExp(nombre, 'i') };
       }
+      
       condiciones.estado = true;
-      const restaurantes = await Restaurante.find(condiciones);
+      await calcularPopularidad();
+
+      const restaurantes = await Restaurante.find(condiciones)
+        .sort({ popularidad: -1 }); 
+  
   
       res.status(200).json(restaurantes);
     } catch (err) {
