@@ -1,28 +1,5 @@
 import Pedido from './pedidos.model';
 
-async function calculatePopularity(id) {
-  try{
-  const pedidosEntregados = await Pedido.aggregate([
-    {
-      $match: {
-        estado: 'ENTREGADO'
-      }
-    },
-    {
-      $group: {
-        _id: id,
-        total: { $sum: 1 }
-      }
-    }
-  ]);
-
-  return pedidosEntregados[0].total
-}catch (error) {
-    console.error('Error al calcular la popularidad del restaurante:', error);
-    throw error;
-}
-  
-}
 
 export async function createPedido(req, res) {
     try {
